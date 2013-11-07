@@ -36,18 +36,17 @@
       (menu-items)
       (menu-names)))
 
-(defn kitchen-id [kitchen]
-  (get-in juvenes-ids [kitchen :kitchen-id]))
-
-(defn menutype-id [kitchen]
-  (get-in juvenes-ids [kitchen :menutype-id]))
+(defn list-template [kitchen]
+  (node [:ul {:class (name kitchen)}]))
 
 (defn menuitem-template [menu-item]
   (node [:li {:class "menu-item"} menu-item]))
 
-(defn output-menu [data]
+(defn output-menu [kitchen data]
   (doseq [menu-item (handle-data data)]
-    (-> (sel1 ".menu-list")
+    (-> (sel1 ".container-data")
+        (dommy/append! (list-template kitchen)))
+    (-> (sel1 (str "." (name kitchen)))
         (dommy/append! (menuitem-template menu-item)))))
 
 (defn menu-today [kitchen]
@@ -59,7 +58,7 @@
                       "format" "json"}
         query (query-string query-params)
         request-url (str menu-url query)]
-    (jsonp request-url :on-success #(output-menu %))))
+    (jsonp request-url :on-success #(output-menu kitchen %))))
 
 (defn ^:export init []
-  (menu-today :zip))
+  (doseq [restaurant (keys juvenes-ids)] (menu-today restaurant)))
