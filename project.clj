@@ -5,7 +5,7 @@
                  [org.clojure/clojurescript "0.0-1978"]
                  [bk/ring-gzip "0.1.1"]
                  [compojure "1.1.5"]
-                 [domina "1.0.2"]
+                 [prismatic/dommy "0.1.1"]
                  [ring "1.1.8"]
                  [shoreleave/shoreleave-remote "0.3.0"]]
   :plugins [[lein-cljsbuild "0.3.4"]
