@@ -1,35 +1,26 @@
 (ns juvenes-menu.server
-  (:require [ring.adapter.jetty :as jetty]
+  (:require [compojure.core :refer [defroutes GET]]
+            [compojure.route :refer [resources not-found]]
+            [compojure.handler :refer [site]]
+            [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.resource :as resources]
-            [ring.util.response :as response])
+            [ring.middleware.gzip :refer [wrap-gzip]]
+            [ring.util.response :refer [redirect]])
   (:gen-class))
 
-(defn render-app []
-  {:status 200
-   :headers {"Content-Type" "text/html"}
-   :body
-   (str "<!DOCTYPE html>"
-        "<html>"
-        "<head>"
-        "<link rel=\"stylesheet\" href=\"css/page.css\" />"
-        "</head>"
-        "<body>"
-        "<div>"
-        "<p id=\"clickable\">Click me!</p>"
-        "</div>"
-        "<script src=\"js/cljs.js\"></script>"
-        "</body>"
-        "</html>")})
+(defroutes app-routes
+  (GET "/" [] (redirect "/menu.html"))
+  (resources "/")
+  (not-found "Page not found"))
 
-(defn handler [request]
-  (if (= "/" (:uri request))
-      (response/redirect "/help.html")
-      (render-app)))
+(def handler
+  (site app-routes))
 
-(def app 
+(def app
   (-> handler
-    (resources/wrap-resource "public")))
+      (wrap-gzip)))
 
 (defn -main [& args]
-  (jetty/run-jetty app {:port 3000}))
+  (let [port (Integer/parseInt (get (System/getenv) "PORT" "8080"))]
+    (run-jetty app {:port port})))
 
