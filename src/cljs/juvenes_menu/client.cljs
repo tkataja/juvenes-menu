@@ -1,8 +1,11 @@
 (ns juvenes-menu.client
   (:require [clojure.string :as str]
-            [domina :as dom]
+            [dommy.utils :as utils]
+            [dommy.core :as dommy]
             [shoreleave.remotes.jsonp :refer [jsonp]]
-            [juvenes-menu.util :refer [json-parse week-number weekday]]))
+            [juvenes-menu.util :refer [json-parse week-number weekday]])
+  (:use-macros
+            [dommy.macros :only [node sel1]]))
 
 (def juvenes-ids {:zip {:kitchen-id 12 :menutype-id 60}
                   :edison {:kitchen-id 2 :menutype-id 60}
@@ -31,8 +34,7 @@
       (json-parse)
       (meal-options)
       (menu-items)
-      (menu-names)
-      (#(assoc {} :dishes %)))) ; results {:dishes [lunch1-str lunch2-str ...]}
+      (menu-names)))
 
 (defn kitchen-id [kitchen]
   (get-in juvenes-ids [kitchen :kitchen-id]))
@@ -40,9 +42,13 @@
 (defn menutype-id [kitchen]
   (get-in juvenes-ids [kitchen :menutype-id]))
 
+(defn menuitem-template [menu-item]
+  (node [:li {:class "menu-item"} menu-item]))
+
 (defn output-menu [data]
-  (let [menu (handle-data data)]
-    (dom/set-text! (dom/by-id "dishes") (get menu :dishes))))
+  (doseq [menu-item (handle-data data)]
+    (-> (sel1 ".menu-list")
+        (dommy/append! (menuitem-template menu-item)))))
 
 (defn menu-today [kitchen]
   (let [query-params {"KitchenId" (get-in juvenes-ids [kitchen :kitchen-id])
