@@ -1,5 +1,6 @@
 (ns juvenes-menu.util
-  (:require [goog.date :as date]))
+  (:require [clojure.string :as str]
+    		[goog.date :as date]))
 
 (defn json-parse
   "Parses a JSON string to JS object which is transformed to Clojure map."

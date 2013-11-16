@@ -20,7 +20,7 @@
                 ;; Google Closure Compiler options
                 :compiler {;; the name of emitted JS script file
                            :output-to "resources/public/js/juvenes-menu-dbg.js"
-
+                           :source-map "resources/public/js/juvenes-menu-dbg.js.map"
                            ;; minimum optimization
                            :optimizations :whitespace
 
