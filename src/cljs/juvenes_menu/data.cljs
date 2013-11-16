@@ -1,8 +1,10 @@
 (ns juvenes-menu.data
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [clojure.string :as str]
-     		[shoreleave.remotes.jsonp :refer [jsonp]]
+            [cljs.core.async :refer [put! chan <!]]
             [juvenes-menu.util :refer [json-parse week-number weekday]]
-            [juvenes-menu.view :refer [output-menu]]))
+            [juvenes-menu.view :refer [output-menu]]
+            [shoreleave.remotes.jsonp :refer [jsonp]]))
 
 (def juvenes-ids {:zip {:kitchen-id 12 :menutype-id 60}
                   :edison {:kitchen-id 2 :menutype-id 60}
@@ -36,6 +38,10 @@
       (menu-items)
       (menu-names)))
 
+;; Fetch the menu and put the result on channel like in 
+;; the following tutorial.
+;; http://swannodette.github.io/2013/11/07/clojurescript-101/
+
 (defn menu-today [kitchen]
   (let [query-params {"KitchenId" (get-in juvenes-ids [kitchen :kitchen-id])
                       "MenuTypeId" (get-in juvenes-ids [kitchen :menutype-id])
@@ -44,9 +50,14 @@
                       "lang" "'fi'"
                       "format" "json"}
         query (query-string query-params)
-        request-url (str menu-url query)]
+        request-url (str menu-url query)
+        out (chan)]
     (jsonp request-url
-           :on-success 
-           (fn [result]
-             (js/console.log result)
-             (output-menu kitchen (handle-data result))))))
+           :on-success
+           (fn [res]
+             (put! out (into {} {:kitchen (str/capitalize (name kitchen))
+                                 :menu (handle-data res)})))
+           :on-timeout
+           (fn [_]
+             (js/console.log "Couldn't fetch the menu")))
+    out))
