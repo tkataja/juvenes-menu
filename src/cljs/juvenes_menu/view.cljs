@@ -4,15 +4,20 @@
   (:use-macros
     [dommy.macros :only [node sel1]]))
 
-(defn list-template [kitchen]
-  (node [:ul {:class (name kitchen)}]))
+(defn list-template [kitchen-name]
+  (node [:ul {:class kitchen-name}]))
 
 (defn menuitem-template [menu-item]
   (node [:li {:class "menu-item"} menu-item]))
 
-(defn output-menu [kitchen data]
-  (doseq [menu-item data]
-    (-> (sel1 ".container-data")
-        (dommy/append! (list-template kitchen)))
-    (-> (sel1 (str "." (name kitchen)))
-        (dommy/append! (menuitem-template menu-item)))))
+(defn restaurant-template [kitchen-name]
+  (node [:div {:class "restaurant-info" :id kitchen-name}
+         	[:h2 {:class "restaurant-name"} kitchen-name]]))
+
+(defn output-menu [data]
+  (let [kitchen-name (:kitchen data)]
+  	(-> (sel1 ".menu-container")
+        (dommy/append! (restaurant-template kitchen-name)))
+    (doseq [menu-item (:menu data)]
+      (-> (sel1 (str "#" kitchen-name))
+          (dommy/append! (menuitem-template menu-item))))))
