@@ -2,7 +2,8 @@
   :description "Juvenes TTY menus"
   :url "http://github.com/tkataja/juvenes-menu"
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-1978"]
+                 [org.clojure/clojurescript "0.0-2030"]
+                 [org.clojure/core.async "0.1.256.0-1bf8cf-alpha"]
                  [bk/ring-gzip "0.1.1"]
                  [compojure "1.1.5"]
                  [prismatic/dommy "0.1.1"]
@@ -20,7 +21,7 @@
                 ;; Google Closure Compiler options
                 :compiler {;; the name of emitted JS script file
                            :output-to "resources/public/js/juvenes-menu-dbg.js"
-                           :source-map "resources/public/js/juvenes-menu-dbg.js.map"
+                           
                            ;; minimum optimization
                            :optimizations :whitespace
 
