@@ -5,5 +5,5 @@
             [cljs.core.async :refer [<!]]))
 
 (defn ^:export init []
-  (doseq [restaurant (data/get-restaurants)]
-    (go (view/output-menu (<! (data/menu-today restaurant))))))
+  (doseq [kitchen (data/get-kitchens)]
+    (go (view/render-menu (<! (data/menu-today kitchen))))))
