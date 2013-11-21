@@ -3,7 +3,6 @@
   (:require [clojure.string :as str]
             [cljs.core.async :refer [put! chan <!]]
             [juvenes-menu.util :refer [json-parse week-number weekday]]
-            [juvenes-menu.view :refer [output-menu]]
             [shoreleave.remotes.jsonp :refer [jsonp]]))
 
 (def menu-url "http://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByWeekday")
