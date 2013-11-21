@@ -12,6 +12,8 @@
   :plugins [[lein-cljsbuild "0.3.4"]
             [lein-ring "0.8.7"]]
   ;:hooks [leiningen.cljsbuild]
+  :uberjar-name "juvenes-menu-standalone.jar"
+  :min-lein-version "2.0.0"
   :source-paths ["src/clj"]
   :cljsbuild {:builds
               {:dbg
