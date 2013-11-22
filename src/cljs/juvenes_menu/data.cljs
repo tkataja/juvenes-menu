@@ -1,5 +1,4 @@
 (ns juvenes-menu.data
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [clojure.string :as str]
             [cljs.core.async :refer [put! chan <!]]
             [juvenes-menu.util :refer [json-parse week-number weekday]]
