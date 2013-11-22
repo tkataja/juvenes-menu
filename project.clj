@@ -2,7 +2,7 @@
   :description "Juvenes TTY menus"
   :url "http://github.com/tkataja/juvenes-menu"
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2030"]
+                 [org.clojure/clojurescript "0.0-1978"]
                  [org.clojure/core.async "0.1.256.0-1bf8cf-alpha"]
                  [bk/ring-gzip "0.1.1"]
                  [compojure "1.1.5"]
@@ -11,7 +11,6 @@
                  [shoreleave/shoreleave-remote "0.3.0"]]
   :plugins [[lein-cljsbuild "0.3.4"]
             [lein-ring "0.8.7"]]
-  ;:hooks [leiningen.cljsbuild]
   :uberjar-name "juvenes-menu-standalone.jar"
   :min-lein-version "2.0.0"
   :source-paths ["src/clj"]
