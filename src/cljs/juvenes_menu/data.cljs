@@ -30,17 +30,14 @@
 (defn get-kitchens []
   (keys juvenes-ids))
 
-(defn meal-options [menu-json]
-  (:MealOptions menu-json))
-
 (defn menu-items [meal-options]
   (map :MenuItems meal-options))
 
-(defn menu-names [menu-items]
-  (map #(map :Name %) menu-items))
+(defn menu-names [items]
+  (map #(map :Name %) items))
 
-(defn categorize [menu-names]
-  (map #(hash-map :main-dish (first %) :side-dishes (rest %)) menu-names))
+(defn categorize [item-names]
+  (map #(hash-map :main-dish (first %) :side-dishes (rest %)) item-names))
 
 ;; The menu data will be in the following format:
 ;; {:kitchen-name <name of the kitchen>
@@ -50,7 +47,7 @@
   (-> (:d data)      ; Get the kitchen menu as JSON string
       (json-parse)   ; Convert JSON string->JS object->CLJS data structure
       (walk/keywordize-keys)
-      (meal-options) 
+      (:MealOptions)
       (menu-items)   
       (menu-names)   
       (categorize))) ; Separate to main dish and side dishes
