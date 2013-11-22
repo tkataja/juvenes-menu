@@ -20,7 +20,7 @@ body {
   margin-bottom:4px;
   border-top: 1px solid #dbdbdb;
   padding: 10px;
-  height: 35px;
+  min-height: 35px;
   margin:0px;
 }
 .side-dish-item {
