@@ -15,43 +15,11 @@
   :min-lein-version "2.0.0"
   :source-paths ["src/clj"]
   :cljsbuild {:builds
-              {:dbg
-               {;; clojurescript source code path
-                :source-paths ["src/brepl" "src/cljs"]
-
-                ;; Google Closure Compiler options
-                :compiler {;; the name of emitted JS script file
-                           :output-to "resources/public/js/juvenes-menu-dbg.js"
-                           
-                           ;; minimum optimization
-                           :optimizations :whitespace
-
-                           ;; prettyfying emitted JS
-                           :pretty-print true}}
-               :pre
-               {;; clojurescript source code path
-                :source-paths ["src/brepl" "src/cljs"]
-                :compiler {;; different output name
-                           :output-to "resources/public/js/juvenes-menu-pre.js"
-
-                           ;; simple optmization
-                           :optimizations :simple
-
-                           ;; no need prettyfication
-                           :pretty-print false}}
-
-               :prod
-               {;; clojurescript source code path
+              {:prod
+               {
                 :source-paths ["src/cljs"]
-
-                ;; Google Closure Compiler options
-                :compiler {;; the name of emitted JS script file
-                           :output-to "resources/public/js/juvenes-menu.js"
-
-                           ;; advanced optimization
+                :compiler {:output-to "resources/public/js/juvenes-menu.js"
                            :optimizations :advanced
-
-                           ;; no need prettyfication
                            :pretty-print false}}}}
   :main juvenes-menu.server
   :ring {:handler juvenes-menu.server/app})
