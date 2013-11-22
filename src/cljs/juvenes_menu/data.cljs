@@ -1,10 +1,11 @@
 (ns juvenes-menu.data
-  (:require [clojure.string :as str]
+  (:require [clojure.string :as string]
+            [clojure.walk :as walk]
             [cljs.core.async :refer [put! chan <!]]
             [juvenes-menu.util :refer [json-parse week-number weekday]]
             [shoreleave.remotes.jsonp :refer [jsonp]]))
 
-(def menu-url "http://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByWeekday")
+(def menu-url "http://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByWeekday?")
 
 (def juvenes-ids {:zip {:kitchen-id 12 :menutype-id 60}
                   :edison {:kitchen-id 2 :menutype-id 60}
@@ -12,35 +13,31 @@
                   :fusion {:kitchen-id 6 :menutype-id 3}})
 
 (defn url-parameter [map-entry]
-  (str (key map-entry) "=" (val map-entry)))
+  (str (name (key map-entry)) "=" (val map-entry)))
 
 (defn create-query-string [query-params]
-  (str "?" (str/join "&" (map url-parameter query-params))))
+  (string/join "&" (map url-parameter query-params)))
 
 (defn request-url-today [kitchen]
-  (let [query-params {"KitchenId" (get-in juvenes-ids [kitchen :kitchen-id])
-                      "MenuTypeId" (get-in juvenes-ids [kitchen :menutype-id])
-                      "Week" (week-number)
-                      "WeekDay" (weekday)
-                      "lang" "'fi'"
-                      "format" "json"}]
+  (let [query-params {:KitchenId (get-in juvenes-ids [kitchen :kitchen-id])
+                      :MenuTypeId (get-in juvenes-ids [kitchen :menutype-id])
+                      :Week (week-number)
+                      :WeekDay (weekday)
+                      :lang "'fi'"
+                      :format "json"}]
     (str menu-url (create-query-string query-params))))
 
 (defn get-kitchens []
   (keys juvenes-ids))
 
-(defn meal-options [menu-json]
-  (get menu-json "MealOptions"))
-
 (defn menu-items [meal-options]
-  (map #(get % "MenuItems") meal-options))
+  (map :MenuItems meal-options))
 
-(defn menu-names [menu-items]
-  (map (fn [item]
-         (map #(get % "Name") item)) menu-items))
+(defn menu-names [items]
+  (map #(map :Name %) items))
 
-(defn categorize [menu-names]
-  (map #(hash-map :main-dish (first %) :side-dishes (rest %)) menu-names))
+(defn categorize [item-names]
+  (map #(hash-map :main-dish (first %) :side-dishes (rest %)) item-names))
 
 ;; The menu data will be in the following format:
 ;; {:kitchen-name <name of the kitchen>
@@ -49,7 +46,8 @@
 (defn create-menu [data]
   (-> (:d data)      ; Get the kitchen menu as JSON string
       (json-parse)   ; Convert JSON string->JS object->CLJS data structure
-      (meal-options) 
+      (walk/keywordize-keys)
+      (:MealOptions)
       (menu-items)   
       (menu-names)   
       (categorize))) ; Separate to main dish and side dishes
@@ -63,7 +61,7 @@
     (jsonp (request-url-today kitchen)
            :on-success 
            (fn [data]
-             (let [kitchen-name (str/capitalize (name kitchen))
+             (let [kitchen-name (string/capitalize (name kitchen))
                    kitchen-menu (create-menu data)]
                (put! channel (hash-map :kitchen-name kitchen-name
                                        :kitchen-menu kitchen-menu))))
