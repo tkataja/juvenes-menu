@@ -10,9 +10,6 @@
 (defn weekday []
   (.getDay (date/Date.)))
 
-(defn year []
-  (.getFullYear (date/Date.)))
-
 (defn week-number []
   (.getWeekNumber (date/Date.)))
 

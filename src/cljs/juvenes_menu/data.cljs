@@ -1,7 +1,7 @@
 (ns juvenes-menu.data
   (:require [clojure.string :as string]
             [clojure.walk :as walk]
-            [cljs.core.async :refer [put! chan <!]]
+            [cljs.core.async :refer [put! chan]]
             [juvenes-menu.util :refer [json-parse week-number weekday]]
             [shoreleave.remotes.jsonp :refer [jsonp]]))
 
@@ -43,9 +43,9 @@
 ;; {:kitchen-name <name of the kitchen>
 ;;  :kitchen-menu {:main-dish <main dish name> :side-dishes [<side dish 1>, <side dish 2>, ...]}}
 
-(defn create-menu [data]
-  (-> (:d data)      ; Get the kitchen menu as JSON string
-      (json-parse)   ; Convert JSON string->JS object->CLJS data structure
+(defn create-menu [json-string]
+  (-> json-string      
+      (json-parse)   ;Convert JSON string->JS object->CLJS data structure
       (walk/keywordize-keys)
       (:MealOptions)
       (menu-items)   
@@ -61,8 +61,9 @@
     (jsonp (request-url-today kitchen)
            :on-success 
            (fn [data]
-             (let [kitchen-name (string/capitalize (name kitchen))
-                   kitchen-menu (create-menu data)]
+             (let [json-string (:d data)
+                   kitchen-name (string/capitalize (name kitchen))
+                   kitchen-menu (create-menu json-string)]
                (put! channel (hash-map :kitchen-name kitchen-name
                                        :kitchen-menu kitchen-menu))))
            :on-timeout 
